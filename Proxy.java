@@ -12,26 +12,25 @@ public class Proxy{
 
 	public static void main(String[] argz) throws IOException {
 	
-		ServerSocket ss = null;
+		ServerSocket serverSocket = null;
 		
-		//my port number
+		//my port number 5000 + 638
 		int port = 5638;
 		
 		try{
 		
-			ss = new ServerSocket(port);
+			serverSocket = new ServerSocket(port);
 			System.out.println("Waiting for a request" + port);
 			
 		} catch(IOException e){
 		
-			System.err.println("Couldn't listen to port" + port);
+			System.err.println("Port Error:" + port);
 			System.exit(-1);
 		}
 		
 		while(true){
 		
-				new ProxyThread(ss.accept()).start();
-				
-			}
+				new ProxyThread(serverSocket.accept()).start();
+        }
 		}
 	}
