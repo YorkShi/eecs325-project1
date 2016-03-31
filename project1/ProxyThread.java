@@ -19,16 +19,21 @@ public class ProxyThread extends Thread {
 	public void run() {
 
         try {
+            
+            ArrayList<String> httpRequest = new ArrayList<String>();
         	
         	BufferedReader in = new BufferedReader(new InputStreamReader(aSocket.getInputStream()));
+            
             DataOutputStream out = new DataOutputStream(aSocket.getOutputStream());
 
             String input;
             int index = 0;
             String url = "";
-            ArrayList<String> httpreq = new ArrayList<String>();
+            
+            
             
             while ((input = in.readLine()) != null) {
+                
                 try {
                     
                     StringTokenizer nToken = new StringTokenizer(input);
@@ -46,7 +51,7 @@ public class ProxyThread extends Thread {
                     System.out.println("Request for : " + url);
                 }
                 else
-                	httpreq.add(input);
+                	httpRequest.add(input);
                 System.out.println(input);
 
                 index++;
@@ -68,7 +73,8 @@ public class ProxyThread extends Thread {
                 
             }catch (Exception e) {
             	
-                    System.out.println("This URL " + url + " was not able to be processed.");
+                    System.out.println( url + " cannot be processed.");
+                
             }
             
             System.out.println("Socket being created for "+ hName);
@@ -76,12 +82,14 @@ public class ProxyThread extends Thread {
             Socket socket = new Socket(hName, 80);
             System.out.println("Socket created!");
 
-    		PrintWriter serv = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))); 
+    		PrintWriter serv = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
+            
     		System.out.println("Sending request to: " + url);
-    		serv.println("GET " + directory + " HTTP/1.1");
-    		for(int i = 0; i < httpreq.size(); i++) {
+    		serv.println("GET " + directory);
+            
+    		for(int i = 0; i < httpRequest.size(); i++) {
     			
-    			serv.println(httpreq.get(i));
+    			serv.println(httpRequest.get(i));
     		}
             
     		serv.println(); 
@@ -101,9 +109,9 @@ public class ProxyThread extends Thread {
     		in.close();
     		out.close();
     		is.close();
-            
     		
         }
+        
         catch (Exception e) {
         	
         	System.err.println("Error:" + e.getMessage());
