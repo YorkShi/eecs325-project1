@@ -1,73 +1,20 @@
 #!/usr/bin/python
 """
-This module contains the code for the second EECS 325 Networks project.
-It is similar to a UDP traceroute and is designed to investigate the
-dependency between hop count and RTT
-Devin Schwab (dts34)
+eecs325 Project 2
+Yuanjing Shi
+yxs638
+
 """
 
 import sys
+import random
+import pdb
 import socket
 import urllib2
-import random
+
 
 from packet_builder import *
-
 from math import ceil
-
-import pdb
-
-def calculate_distance(p1, p2):
-    """
-    This method takes in a latitude and
-    longitude tuple for two different
-    points and using the
-    haversine formula calculates the distance between the
-    two
-    """
-    from math import pi, sin, cos, atan2, sqrt
-
-    R = 6371
-    dLat = (p2[0]-p1[0])*pi/180
-    dLon = (p2[1]-p1[1])*pi/180
-    lat1 = p1[0]*pi/180
-    lat2 = p2[0]*pi/180
-
-    a = sin(dLat/2)*sin(dLat/2) + sin(dLon/2)*sin(dLon/2)*cos(lat1)*cos(lat2)
-    c = 2*atan2(sqrt(a), sqrt(1-a))
-    return R*c
-
-def get_lat_lon(ip):
-    """
-    Given an IP address this function makes a request
-    to http://freegeoip.net/xml/ and then parses the xml
-    to get the latitude and longitude of this IP address
-    """
-    import xml.etree.ElementTree as ET
-    base_url = 'http://freegeoip.net/xml/'
-
-    url = base_url + ip
-    xml_string = urllib2.urlopen(url).read()
-
-    root = ET.fromstring(xml_string)
-
-    try:
-        latitude = float(root.find('Latitude').text)
-        longitude = float(root.find('Longitude').text)
-        return (latitude, longitude)
-    except AttributeError:
-        return
-
-
-
-def calculate_ip_distance(ip1, ip2):
-    """
-    Given two IP's this function finds the latitude
-    and longitude and returns the distance between them.
-    """
-    p1 = get_lat_lon(ip1)
-    p2 = get_lat_lon(ip2)
-    return calculate_distance(p1, p2)
 
 if __name__ == '__main__':
     import argparse
@@ -217,3 +164,38 @@ if __name__ == '__main__':
                     print "\t (%i, %i)" % (lower_ttl, upper_ttl)
 
     output.close()
+
+def getCoordinate(ip):
+
+    import xml.etree.ElementTree as ET
+    base_url = 'http://freegeoip.net/xml/'
+
+    url = base_url + ip
+    xml_string = urllib2.urlopen(url).read()
+
+    root = ET.fromstring(xml_string)
+
+    try:
+        latitude = float(root.find('Latitude').text)
+        longitude = float(root.find('Longitude').text)
+        return (latitude, longitude)
+    except AttributeError:
+        return
+
+def calculate_ip_distance(ip1, ip2):
+
+    from math import *
+
+    p1 = getCoordinate(ip1)
+    p2 = getCoordinate(ip2)
+
+    x = 6371
+    dLat = (p2[0]-p1[0])*pi/180
+    dLon = (p2[1]-p1[1])*pi/180
+    lat1 = p1[0]*pi/180
+    lat2 = p2[0]*pi/180
+
+    a = sin(dLat/2)*sin(dLat/2) + sin(dLon/2)*sin(dLon/2)*cos(lat1)*cos(lat2)
+    b = atan2(sqrt(a), sqrt(1-a))*2
+
+    return x*b
